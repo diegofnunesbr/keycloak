@@ -17,7 +17,8 @@ data:
       "groups": [
         { "name": "argocd-admins" },
         { "name": "jenkins-admins" },
-        { "name": "grafana-admins" }
+        { "name": "grafana-admins" },
+        { "name": "rundeck-admins" }
       ],
       "users": [
         {
@@ -27,7 +28,7 @@ data:
           "email": "diegofnunesbr@gmail.com",
           "emailVerified": true,
           "enabled": true,
-          "groups": ["/argocd-admins", "/jenkins-admins", "/grafana-admins"]
+          "groups": ["/argocd-admins", "/jenkins-admins", "/grafana-admins", "/rundeck-admins"]
         }
       ],
       "clients": [

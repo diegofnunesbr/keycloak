@@ -55,8 +55,8 @@ primeira subida** (se o realm já existe, o Keycloak ignora o arquivo).
 Ele cria:
 
 - usuário `diegofnunesbr` (sem senha; defina com `change-user-password.sh`)
-- grupos `argocd-admins`, `jenkins-admins` e `grafana-admins`, com o seu
-  usuário nos três
+- grupos `argocd-admins`, `jenkins-admins`, `grafana-admins` e
+  `rundeck-admins`, com o seu usuário em todos
 - cliente `argocd`: público, com PKCE (`S256`), então não tem segredo de
   cliente guardado em lugar nenhum. O token leva um campo `groups` com os
   grupos do usuário, que o ArgoCD usa pra dar permissão.
