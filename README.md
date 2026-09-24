@@ -64,11 +64,18 @@ Mudanças depois disso são feitas no console de administração
 (`https://keycloak.diegofnunesbr.com/admin`, realm `homelab`). Se quiser que
 uma mudança sobreviva a uma reinstalação do zero, replique no JSON.
 
+`./change-user-password.sh` também garante que `diegofnunesbr` existe no
+realm `master`, com o papel `admin` (superusuário do Keycloak inteiro) -
+não dá pra popular o `master` pelo import de realm (limitação do próprio
+Keycloak), então isso é feito pelo script. O `admin` temporário criado no
+bootstrap continua existindo, sem conflito: são duas contas separadas com
+o mesmo nível de acesso ao `master`.
+
 ## Senhas
 
 | O quê | Onde fica | Como trocar |
 |---|---|---|
-| Seu usuário (`diegofnunesbr`, realm `homelab`) | só no banco do Keycloak | `./change-user-password.sh` |
+| Seu usuário (`diegofnunesbr`, realm `homelab` **e** `master`) | só no banco do Keycloak | `./change-user-password.sh` |
 | Admin do Keycloak (realm `master`) | `k8s/keycloak-admin.sealed.yaml` | `./change-admin-password.sh` (troca no Keycloak e sela de novo) |
 | Postgres | `k8s/keycloak-db.sealed.yaml` | aleatória, não precisa trocar |
 
