@@ -1,0 +1,20 @@
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  annotations:
+    sealedsecrets.bitnami.com/cluster-wide: "true"
+  creationTimestamp: null
+  name: keycloak-db
+  namespace: keycloak
+spec:
+  encryptedData:
+    password: AgBF0xzGo5dUTB+2oOUjC1VyGoDX/MoYmTtITcArFa89YZQ0IZLipkpopDEwxUjUYhJf4E1OO0g3+F3L/Jj4lJuneqCUjC9XLqRLyKjM+HVyYdld161jY4VN3PYNPahNWenchpRamkyGkXZ8gAbYgA+vCvfVWmFdy7/aBbotcSZVpM/F95Dr9Io0rFaGSP7WnqEfVj7+OMlUjZn15hTEhJ61/9zkp/eO16XonfbhMlOHMroD6fLARFhZ3BwgV/OARRu2NkpRG4Cj6hNckh6FcLY35oUeFavdzzrb/pZkPIDxIueBI66r/EdQ+j+myRPG7PyUhoJet7lqOJ2tJdb0/rvXbS0wTwepLrknG7nxCMfcsZ4SgEZxiLPgadoQgITOKvx6soWRSMEZpNj+/CzbdydndYsEivTtOJl7e88MVYv4E1TxPgrpcDBSqZCRyTjSZlyQ48xLoENpQf8zAM9j3cNeC5ytxl0mFSr3bYrzAY/WgxfWpAbafWuPMVOjJyuwyz2WfgJLyovF4/fm0crTswLknCG8BHkjoeWsR6f77Ci3ZkLGkqqBr8dZT69EzwF7lGMeYlSIllLQcXGLY1W3ymPzQHuU0AExEzijIWMI47BmwLNY0fXDuH28S2M5yZ12ey3VotnC5QvXSZ7xepn/aKywX8EtISW5nceO5SMXGzhHe+UEu5ZnnuE7URV2mqm346bnMuzaOJ+OdGkz0iBk6cNVJvAQkxZrG+Z2SoXxJHJ/Tz3F0+Egqm4NRlHgqBJogAo=
+  template:
+    metadata:
+      annotations:
+        sealedsecrets.bitnami.com/cluster-wide: "true"
+      creationTimestamp: null
+      name: keycloak-db
+      namespace: keycloak
+    type: Opaque
+
