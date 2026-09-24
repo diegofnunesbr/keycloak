@@ -165,7 +165,7 @@ spec:
       volumes:
         - name: realm-import
           configMap:
-            name: realm-homelab
+            name: realm-home
 ---
 apiVersion: v1
 kind: Service

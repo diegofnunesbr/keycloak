@@ -24,10 +24,10 @@ keycloak/
 │   └── argocd.keycloak.yaml         # Application do Argo CD
 ├── k8s/
 │   ├── keycloak.yaml                # Namespace, Postgres, Keycloak, Service, Ingress
-│   ├── realm-homelab.yaml           # realm homelab (importado na primeira subida)
+│   ├── realm-home.yaml           # realm home (importado na primeira subida)
 │   ├── keycloak-db.sealed.yaml      # senha do Postgres (aleatória, selada)
 │   └── keycloak-admin.sealed.yaml   # usuário e senha do admin do Keycloak (selada)
-├── change-user-password.sh          # senha do seu usuário no realm homelab
+├── change-user-password.sh          # senha do seu usuário no realm home
 ├── change-admin-password.sh         # senha do admin do Keycloak
 └── README.md
 ```
@@ -48,9 +48,9 @@ seu usuário, sem ela não dá pra entrar em nada:
 ./change-user-password.sh
 ```
 
-## Realm `homelab`
+## Realm `home`
 
-`k8s/realm-homelab.yaml` é importado com `--import-realm` **só na
+`k8s/realm-home.yaml` é importado com `--import-realm` **só na
 primeira subida** (se o realm já existe, o Keycloak ignora o arquivo).
 Ele cria:
 
@@ -61,14 +61,14 @@ Ele cria:
   grupos do usuário, que o ArgoCD usa pra dar permissão.
 
 Mudanças depois disso são feitas no console de administração
-(`https://keycloak.diegofnunesbr.com/admin`, realm `homelab`). Se quiser que
+(`https://keycloak.diegofnunesbr.com/admin`, realm `home`). Se quiser que
 uma mudança sobreviva a uma reinstalação do zero, replique no JSON.
 
 ## Senhas
 
 | O quê | Onde fica | Como trocar |
 |---|---|---|
-| Seu usuário (`diegofnunesbr`, realm `homelab`) | só no banco do Keycloak | `./change-user-password.sh` |
+| Seu usuário (`diegofnunesbr`, realm `home`) | só no banco do Keycloak | `./change-user-password.sh` |
 | Admin do Keycloak (realm `master`) | `k8s/keycloak-admin.sealed.yaml` | `./change-admin-password.sh` (troca no Keycloak e sela de novo) |
 | Postgres | `k8s/keycloak-db.sealed.yaml` | aleatória, não precisa trocar |
 
@@ -85,7 +85,7 @@ normalmente; o aviso é só a recomendação de criar um admin permanente.
 ## Reinstalação do zero
 
 O banco do Keycloak mora na PVC `postgres-data`. Com o cluster recriado,
-ele sobe vazio: o realm `homelab` é importado de novo pelo JSON e o admin é
+ele sobe vazio: o realm `home` é importado de novo pelo JSON e o admin é
 criado pelo Secret, mas a senha do seu usuário tem que ser definida de
 novo (`change-user-password.sh`). Se a chave do Sealed Secrets também for
 nova, os dois `*.sealed.yaml` precisam ser gerados de novo.
