@@ -22,6 +22,8 @@ data:
           "username": "diegofnunesbr",
           "firstName": "Diego",
           "lastName": "Nunes",
+          "email": "diegofnunesbr@gmail.com",
+          "emailVerified": true,
           "enabled": true,
           "groups": ["/argocd-admins"]
         }
