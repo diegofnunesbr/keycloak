@@ -16,7 +16,8 @@ data:
       "bruteForceProtected": true,
       "groups": [
         { "name": "argocd-admins" },
-        { "name": "jenkins-admins" }
+        { "name": "jenkins-admins" },
+        { "name": "grafana-admins" }
       ],
       "users": [
         {
@@ -26,7 +27,7 @@ data:
           "email": "diegofnunesbr@gmail.com",
           "emailVerified": true,
           "enabled": true,
-          "groups": ["/argocd-admins", "/jenkins-admins"]
+          "groups": ["/argocd-admins", "/jenkins-admins", "/grafana-admins"]
         }
       ],
       "clients": [
