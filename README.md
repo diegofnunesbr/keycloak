@@ -55,14 +55,63 @@ primeira subida** (se o realm já existe, o Keycloak ignora o arquivo).
 Ele cria:
 
 - usuário `diegofnunesbr` (sem senha; defina com `change-user-password.sh`)
-- grupo `argocd-admins`, com o seu usuário dentro
+- grupos `argocd-admins` e `jenkins-admins`, com o seu usuário nos dois
 - cliente `argocd`: público, com PKCE (`S256`), então não tem segredo de
   cliente guardado em lugar nenhum. O token leva um campo `groups` com os
   grupos do usuário, que o ArgoCD usa pra dar permissão.
 
 Mudanças depois disso são feitas no console de administração
 (`https://keycloak.diegofnunesbr.com/admin`, realm `home`). Se quiser que
-uma mudança sobreviva a uma reinstalação do zero, replique no JSON.
+uma mudança sobreviva a uma reinstalação do zero, replique no JSON -
+**exceto clientes confidenciais** (com segredo, como o `jenkins`, ver
+seção abaixo), que não entram no JSON de propósito.
+
+## Adicionar um cliente confidencial (app com segredo, tipo Jenkins)
+
+Diferente do `argocd` (público, PKCE, sem segredo), a maioria dos apps
+usa um client secret. Esse segredo não vai pro `realm-home.yaml` em texto
+puro - cada app repositório guarda o dele, selado
+(`secrets/<app>-oidc.sealed.yaml`, ver README do repositório do app).
+
+Pra criar um cliente novo desses, rode direto no pod do Keycloak (troque
+`<app>` e as URLs; `kubectl --context=k0s -n keycloak get secret
+keycloak-admin` tem a senha do `admin`):
+
+```bash
+kubectl --context=k0s -n keycloak exec -it deploy/keycloak -- sh -c '
+  /opt/keycloak/bin/kcadm.sh config credentials --server http://localhost:8080 --realm master --user admin
+  /opt/keycloak/bin/kcadm.sh create clients -r home -f - <<EOF
+{
+  "clientId": "<app>",
+  "enabled": true,
+  "publicClient": false,
+  "standardFlowEnabled": true,
+  "directAccessGrantsEnabled": false,
+  "redirectUris": ["https://<app>.diegofnunesbr.com/<caminho-de-callback>"],
+  "webOrigins": ["https://<app>.diegofnunesbr.com"],
+  "attributes": {
+    "post.logout.redirect.uris": "https://<app>.diegofnunesbr.com/*"
+  },
+  "protocolMappers": [{
+    "name": "groups", "protocol": "openid-connect",
+    "protocolMapper": "oidc-group-membership-mapper",
+    "config": {
+      "full.path": "false", "id.token.claim": "true",
+      "access.token.claim": "true", "userinfo.token.claim": "true",
+      "claim.name": "groups"
+    }
+  }]
+}
+EOF
+  CID=$(/opt/keycloak/bin/kcadm.sh get clients -r home -q clientId=<app> --fields id --format csv --noquotes)
+  /opt/keycloak/bin/kcadm.sh get clients/$CID/client-secret -r home --fields value --format csv --noquotes
+'
+```
+
+O valor impresso no final é o segredo - selar ele como `clientSecret` no
+repo do app (mesmo padrão do `secrets/jenkins-oidc.sealed.yaml`).
+**`post.logout.redirect.uris` é fácil de esquecer** (não é o mesmo campo
+de `redirectUris`) e sem ele o logout falha com "Invalid redirect uri".
 
 ## Senhas
 
