@@ -19,17 +19,8 @@ ADMIN_PW=$($K get secret keycloak-admin -o jsonpath='{.data.password}' | base64 
 printf '%s\n%s\n' "$ADMIN_PW" "$PW" | $K exec -i deploy/keycloak -- sh -c '
   IFS= read -r A; IFS= read -r P
   C=/tmp/kcadm-$$.config
-  KC=/opt/keycloak/bin/kcadm.sh
-  $KC config credentials --config "$C" --server http://localhost:8080 --realm master --user "'"$ADMIN_USER"'" --password "$A" >/dev/null
-  $KC set-password --config "$C" -r "'"$REALM"'" --username "'"$USERNAME"'" --new-password "$P"
-
-  if ! $KC get users --config "$C" -r master -q username="'"$USERNAME"'" --fields id --format csv --noquotes | grep -q .; then
-    $KC create users --config "$C" -r master -s username="'"$USERNAME"'" -s enabled=true >/dev/null
-  fi
-  MASTERID=$($KC get users --config "$C" -r master -q username="'"$USERNAME"'" --fields id --format csv --noquotes)
-  $KC set-password --config "$C" -r master --userid "$MASTERID" --new-password "$P"
-  $KC add-roles --config "$C" -r master --uid "$MASTERID" --rolename admin >/dev/null
-
+  /opt/keycloak/bin/kcadm.sh config credentials --config "$C" --server http://localhost:8080 --realm master --user "'"$ADMIN_USER"'" --password "$A" >/dev/null
+  /opt/keycloak/bin/kcadm.sh set-password --config "$C" -r "'"$REALM"'" --username "'"$USERNAME"'" --new-password "$P"
   S=$?; rm -f "$C"; exit $S'
 unset ADMIN_PW PW PW2
-echo "Pronto. Senha de $USERNAME trocada no realm $REALM, e a mesma conta existe no master com o papel admin (o admin temporário não foi tocado)."
+echo "Pronto. Senha de $USERNAME trocada no realm $REALM."
