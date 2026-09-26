@@ -3,7 +3,7 @@ set -euo pipefail
 
 CTX="${KUBE_CONTEXT:-k0s}"
 K="kubectl --context=$CTX -n keycloak"
-REALM="${REALM:-home}"
+REALM="${REALM:-homelab}"
 $K get deploy keycloak >/dev/null || { echo "Sem acesso ao Keycloak pelo contexto '$CTX' (ver README do repositório argocd, seção do kubeconfig)."; exit 1; }
 
 read -rp "Usuário do realm $REALM [diegofnunesbr]: " USERNAME

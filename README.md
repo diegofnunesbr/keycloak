@@ -24,10 +24,10 @@ keycloak/
 │   └── argocd.keycloak.yaml         # Application do Argo CD
 ├── k8s/
 │   ├── keycloak.yaml                # Namespace, Postgres, Keycloak, Service, Ingress
-│   ├── realm-home.yaml           # realm home (importado na primeira subida)
+│   ├── realm-homelab.yaml           # realm homelab (importado na primeira subida)
 │   ├── keycloak-db.sealed.yaml      # senha do Postgres (aleatória, selada)
 │   └── keycloak-admin.sealed.yaml   # usuário e senha do admin do Keycloak (selada)
-├── change-user-password.sh          # senha do seu usuário no realm home
+├── change-user-password.sh          # senha do seu usuário no realm homelab
 ├── change-admin-password.sh         # senha do admin do Keycloak
 └── README.md
 ```
@@ -48,9 +48,9 @@ seu usuário, sem ela não dá pra entrar em nada:
 ./change-user-password.sh
 ```
 
-## Realm `home`
+## Realm `homelab`
 
-`k8s/realm-home.yaml` é importado com `--import-realm` **só na
+`k8s/realm-homelab.yaml` é importado com `--import-realm` **só na
 primeira subida** (se o realm já existe, o Keycloak ignora o arquivo).
 Ele cria:
 
@@ -62,7 +62,7 @@ Ele cria:
   grupos do usuário, que o ArgoCD usa pra dar permissão.
 
 Mudanças depois disso são feitas no console de administração
-(`https://keycloak.diegofnunesbr.com/admin`, realm `home`). Se quiser que
+(`https://keycloak.diegofnunesbr.com/admin`, realm `homelab`). Se quiser que
 uma mudança sobreviva a uma reinstalação do zero, replique no JSON -
 **exceto clientes confidenciais** (com segredo, como o `jenkins`, ver
 seção abaixo), que não entram no JSON de propósito.
@@ -70,7 +70,7 @@ seção abaixo), que não entram no JSON de propósito.
 ## Adicionar um cliente confidencial (app com segredo, tipo Jenkins)
 
 Diferente do `argocd` (público, PKCE, sem segredo), a maioria dos apps
-usa um client secret. Esse segredo não vai pro `realm-home.yaml` em texto
+usa um client secret. Esse segredo não vai pro `realm-homelab.yaml` em texto
 puro - cada app repositório guarda o dele, selado
 (`secrets/<app>-oidc.sealed.yaml`, ver README do repositório do app).
 
@@ -81,7 +81,7 @@ keycloak-admin` tem a senha do `admin`):
 ```bash
 kubectl --context=k0s -n keycloak exec -it deploy/keycloak -- sh -c '
   /opt/keycloak/bin/kcadm.sh config credentials --server http://localhost:8080 --realm master --user admin
-  /opt/keycloak/bin/kcadm.sh create clients -r home -f - <<EOF
+  /opt/keycloak/bin/kcadm.sh create clients -r homelab -f - <<EOF
 {
   "clientId": "<app>",
   "enabled": true,
@@ -104,8 +104,8 @@ kubectl --context=k0s -n keycloak exec -it deploy/keycloak -- sh -c '
   }]
 }
 EOF
-  CID=$(/opt/keycloak/bin/kcadm.sh get clients -r home -q clientId=<app> --fields id --format csv --noquotes)
-  /opt/keycloak/bin/kcadm.sh get clients/$CID/client-secret -r home --fields value --format csv --noquotes
+  CID=$(/opt/keycloak/bin/kcadm.sh get clients -r homelab -q clientId=<app> --fields id --format csv --noquotes)
+  /opt/keycloak/bin/kcadm.sh get clients/$CID/client-secret -r homelab --fields value --format csv --noquotes
 '
 ```
 
@@ -118,7 +118,7 @@ de `redirectUris`) e sem ele o logout falha com "Invalid redirect uri".
 
 | O quê | Onde fica | Como trocar |
 |---|---|---|
-| Seu usuário (`diegofnunesbr`, realm `home`) | só no banco do Keycloak | `./change-user-password.sh` |
+| Seu usuário (`diegofnunesbr`, realm `homelab`) | só no banco do Keycloak | `./change-user-password.sh` |
 | Admin do Keycloak (realm `master`) | `k8s/keycloak-admin.sealed.yaml` | `./change-admin-password.sh` (troca no Keycloak e sela de novo) |
 | Postgres | `k8s/keycloak-db.sealed.yaml` | aleatória, não precisa trocar |
 
@@ -135,7 +135,7 @@ normalmente; o aviso é só a recomendação de criar um admin permanente.
 ## Reinstalação do zero
 
 O banco do Keycloak mora na PVC `postgres-data`. Com o cluster recriado,
-ele sobe vazio: o realm `home` é importado de novo pelo JSON e o admin é
+ele sobe vazio: o realm `homelab` é importado de novo pelo JSON e o admin é
 criado pelo Secret, mas a senha do seu usuário tem que ser definida de
 novo (`change-user-password.sh`). Se a chave do Sealed Secrets também for
 nova, os dois `*.sealed.yaml` precisam ser gerados de novo.
